@@ -25,7 +25,7 @@ const App = () => {
   const fetchMovies = async (searchTerm) => {
   try {
     const OMDBKEY = process.env.REACT_APP_OMDBKEY;
-    const response = await axios.get(`http://www.omdbapi.com/?s=${searchTerm}&apikey=${OMDBKEY}`);
+    const response = await axios.get(`/api/movies?apikey=${OMDBKEY}&s=${searchTerm}`);
 
     if (!response.data || response.data.Error) {
       throw new Error('Unable to fetch movies.');
