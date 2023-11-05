@@ -1,37 +1,37 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const MyList = ({ token, searchTerm }) => {
+const MyList = ({ token }) => {
   const [myList, setMyList] = useState([]);
-  const OMDBKEY = process.env.REACT_APP_OMDBKEY;
 
   useEffect(() => {
     const fetchMyList = async () => {
       try {
-        const response = await fetch('http://localhost:3001/MyList', {
-          method: 'GET',
+        // Fetch user's watchlist
+        const response = await axios.get('/watchlist', {
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
         });
 
-        if (!response.ok) {
-          throw new Error('Error fetching MyList');
+        if (!response.data || response.data.length === 0) {
+          console.log('User has no items in the watchlist');
+          return;
         }
 
-        const data = await response.json();
-
-        // Fetch detailed movie information for each movie in the MyList
+        // Fetch detailed movie information for each movie in the watchlist
         const detailedMyList = await Promise.all(
-          data.map(async (movie) => {
-            const omdbResponse = await fetch(
-              `http://www.omdbapi.com/?apikey=${OMDBKEY}&t=${movie.title}`
+          response.data.map(async (movie) => {
+            // Assuming your watchlist items have a title property
+            const omdbResponse = await axios.get(
+              `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBKEY}&t=${movie.title}`
             );
-            const omdbData = await omdbResponse.json();
+            const omdbData = omdbResponse.data;
             return {
               title: omdbData.Title,
               year: omdbData.Year,
               genre: omdbData.Genre,
+              poster: omdbData.Poster,
             };
           })
         );
@@ -43,7 +43,7 @@ const MyList = ({ token, searchTerm }) => {
     };
 
     fetchMyList();
-  }, [token, OMDBKEY, searchTerm]);
+  }, [token]);
 
   return (
     <div>
@@ -51,7 +51,10 @@ const MyList = ({ token, searchTerm }) => {
       <ul>
         {myList.map((movie, index) => (
           <li key={index}>
-            {movie.title} ({movie.year}) - Genre: {movie.genre}
+            <img src={movie.poster} alt={movie.Title} style={{ width: '150px', height: '225px' }} />
+            <p>
+              {movie.title} ({movie.year}) - Genre: {movie.genre}
+            </p>
           </li>
         ))}
       </ul>
