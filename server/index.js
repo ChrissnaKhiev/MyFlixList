@@ -3,8 +3,10 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const User = require('./models/user'); // Create this model in a separate file
-require('dotenv').config()
+const bodyParser = require('body-parser');
+const User = require('./models/user');
+const cors = require('cors');
+require("dotenv").config(); 
 
 const app = express();
 
@@ -15,6 +17,8 @@ mongoose.connect(process.env.CONNECTIONSTRING, {
 
 app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: process.env.SECRETKEY, resave: true, saveUninitialized: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -68,11 +72,11 @@ app.get('/dashboard', isLoggedIn, (req, res) => {
 });
 
 // Watchlist Route (authenticated users only)
-
 app.post('/add-to-watchlist', isLoggedIn, (req, res) => {
   const { title, year } = req.body;
-  
-  User.findById(req.user._id).exec()  // Use .exec() to return a promise
+
+  User.findById(req.user._id)
+    .exec()
     .then((user) => {
       if (!user) {
         return res.status(404).send('User not found');
@@ -91,7 +95,6 @@ app.post('/add-to-watchlist', isLoggedIn, (req, res) => {
       res.status(500).send('Error adding movie to watchlist');
     });
 });
-
 
 // Logout route
 app.get('/logout', (req, res) => {
