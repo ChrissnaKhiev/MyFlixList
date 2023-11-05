@@ -10,20 +10,21 @@ const UserProfile = ({ token }) => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            // 'Authorization': `Bearer ${token}`, // Comment this line for testing without the token
           },
         });
-
+    
         if (!response.ok) {
           throw new Error('Error fetching user profile');
         }
-
+    
         const data = await response.json();
         setProfile(data);
       } catch (error) {
         console.error('Error fetching user profile:', error);
       }
     };
+    
 
     fetchUserProfile();
   }, [token]);
