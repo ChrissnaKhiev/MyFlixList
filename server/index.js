@@ -18,20 +18,23 @@ app.use(session({ secret: process.env.SECRETKEY, resave: true, saveUninitialized
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Use LocalStrategy with Passport
+passport.use(new LocalStrategy(User.authenticate()));
+
 // Serialize and Deserialize user (to store user in session)
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-
-// Use LocalStrategy with Passport
-passport.use(new LocalStrategy(User.authenticate()));
 
 // Routes
 app.get('/', (req, res) => res.send('Hello World!'));
 
 // Register route
 app.post('/register', (req, res) => {
+  // check watchlist
   const { username, password } = req.body;
-  User.register(new User({ username }), password, (err, user) => {
+  const newUser = new User({ username, watchlist: [] });
+
+  User.register(newUser, password, (err, user) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Error registering user');
@@ -50,8 +53,45 @@ app.post('/login', passport.authenticate('local', {
 
 // Dashboard route (authenticated users only)
 app.get('/dashboard', isLoggedIn, (req, res) => {
-  res.send(`Welcome, ${req.user.username}!`);
+  User.findById(req.user._id)
+    .exec()
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+      res.json(user.watchlist);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error fetching user data');
+    });
 });
+
+// Watchlist Route (authenticated users only)
+
+app.post('/add-to-watchlist', isLoggedIn, (req, res) => {
+  const { title, year } = req.body;
+  
+  User.findById(req.user._id).exec()  // Use .exec() to return a promise
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+
+      const newMovie = { title, year }; // Add more fields as needed
+      user.watchlist.push(newMovie);
+
+      return user.save();  // Save the updated user document
+    })
+    .then(() => {
+      res.send('Movie added to watchlist successfully');
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error adding movie to watchlist');
+    });
+});
+
 
 // Logout route
 app.get('/logout', (req, res) => {
@@ -66,6 +106,30 @@ function isLoggedIn(req, res, next) {
   }
   res.redirect('/login');
 }
+
+// Add the /profile endpoint
+app.get('/profile', isLoggedIn, (req, res) => {
+  res.json({
+    username: req.user.username,
+    email: req.user.email, // Add other user-specific fields as needed
+  });
+});
+
+// Add the /watchlist endpoint
+app.get('/watchlist', isLoggedIn, (req, res) => {
+  User.findById(req.user._id)
+    .exec()
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+      res.json(user.watchlist);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error fetching watchlist');
+    });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
