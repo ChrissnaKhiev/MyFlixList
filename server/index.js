@@ -6,7 +6,7 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const User = require('./models/user');
 const cors = require('cors');
-require("dotenv").config(); 
+require("dotenv").config({path: "../.env"}); 
 
 const app = express();
 
@@ -134,5 +134,5 @@ app.get('/watchlist', isLoggedIn, (req, res) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
