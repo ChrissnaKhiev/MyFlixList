@@ -4,6 +4,7 @@ import Search from './components/Search';
 import MyList from './components/MyList';
 import UserProfile from './components/UserProfile';
 import Login from './components/Login';
+import SearchResults from './components/SearchResults';
 
 const App = () => {
   const [movies, setMovies] = useState([]);
@@ -84,10 +85,12 @@ const App = () => {
 
       <Search onSearch={handleSearch} />
       {error && <p>{error}</p>}
+      <SearchResults movies={movies} /> {/* Include the SearchResults component */}
       <MyList movies={movies} searchTerm={searchTerm} />
       <UserProfile />
     </div>
   );
 };
+
 
 export default App;

@@ -7,7 +7,7 @@ const MyList = ({ token, searchTerm }) => {
   useEffect(() => {
     const fetchMyList = async () => {
       try {
-        const response = await fetch('http://localhost:3000/MyList', {
+        const response = await fetch('http://localhost:3001/MyList', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ const MyList = ({ token, searchTerm }) => {
         const detailedMyList = await Promise.all(
           data.map(async (movie) => {
             const omdbResponse = await fetch(
-              `http://www.omdbapi.com/?t=${movie.title}&apikey=${OMDBKEY}`
+              `http://www.omdbapi.com/?apikey=${OMDBKEY}&t=${movie.title}`
             );
             const omdbData = await omdbResponse.json();
             return {

@@ -7,10 +7,15 @@ const Login = ({ onLogin }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('/login', {
+      const response = await axios.post('http://localhost:3001/login', {
         username,
-        password,
-      }, { withCredentials: true });
+        password
+      }, { 
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
 
       // Assuming the server responds with user data upon successful login
       const userData = response.data;
