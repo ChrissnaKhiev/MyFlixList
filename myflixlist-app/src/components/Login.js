@@ -10,7 +10,7 @@ const Login = ({ onLogin }) => {
       const response = await axios.post('/login', {
         username,
         password,
-      }, { credentials: included });
+      }, { withCredentials: true });
 
       // Assuming the server responds with user data upon successful login
       const userData = response.data;
