@@ -29,7 +29,6 @@ const Dashboard = () => {
       {profile && (
         <div>
           <p>Username: {profile.username}</p>
-          <p>Email: {profile.email}</p>
           {/* Add other profile information as needed */}
         </div>
       )}

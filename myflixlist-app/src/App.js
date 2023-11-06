@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Search from './components/Search';
 import MyList from './components/MyList';
-import UserProfile from './components/UserProfile';
 import Login from './components/Login';
 import SearchResults from './components/SearchResults';
 import Dashboard from './components/Dashboard';
@@ -99,7 +98,6 @@ const App = () => {
     {error && <p>{error}</p>}
     <MyList movies={movies} searchTerm={searchTerm} />
     <SearchResults movies={movies} />
-    <UserProfile />
   </div>
   );
 };
