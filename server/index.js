@@ -71,6 +71,14 @@ app.get('/dashboard', isLoggedIn, (req, res) => {
     });
 });
 
+app.get('/user', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json(req.user); // Assuming user data is stored in req.user when authenticated
+  } else {
+    res.status(401).json({ error: 'Not authenticated' });
+  }
+});
+
 // Watchlist Route (authenticated users only)
 app.post('/add-to-watchlist', isLoggedIn, (req, res) => {
   const { title, year } = req.body;
@@ -98,9 +106,28 @@ app.post('/add-to-watchlist', isLoggedIn, (req, res) => {
 
 // Logout route
 app.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
+  console.log('Logout request received');
+
+  // Use req.logout with a callback function
+  req.logout((err) => {
+    if (err) {
+      console.error('Error during logout:', err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Clear the user session and send a response
+    req.session.destroy((destroyErr) => {
+      if (destroyErr) {
+        console.error('Error destroying session:', destroyErr);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      console.log('Logout successful');
+      res.status(200).json({ message: 'Logout successful' });
+    });
+  });
 });
+
 
 // Middleware to check if user is authenticated
 function isLoggedIn(req, res, next) {
@@ -132,6 +159,12 @@ app.get('/watchlist', isLoggedIn, (req, res) => {
       console.error(err);
       res.status(500).send('Error fetching watchlist');
     });
+});
+
+// Async error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
 });
 
 const PORT = process.env.PORT || 3001;
