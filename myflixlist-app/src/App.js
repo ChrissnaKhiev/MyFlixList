@@ -53,8 +53,9 @@ const App = () => {
       if (userData && userData.username) {
         setUser(userData);
       } else {
-        // Handle unsuccessful login (optional)
-        console.error('Login failed. Invalid user data received.');
+        // Handle unsuccessful login (optional) dunno why
+        window.location.reload();
+        // console.error('Login failed. Invalid user data received.');
         // You can display an error message or perform other actions as needed
       }
     } catch (error) {
@@ -73,6 +74,7 @@ const App = () => {
       setUser(null);
       console.log(user);
       console.log('Logout successful');
+      window.location.reload();
     } catch (error) {
       console.error('Error during logout:', error);
     }
