@@ -48,9 +48,9 @@ const MyList = ({ token }) => {
   return (
     <div>
       <h1>MyList</h1>
-      <ul>
+      <ul style={{ listStyleType: 'none', padding: 0, display: 'flex', overflowX: 'auto' }}>
         {myList.map((movie, index) => (
-          <li key={index}>
+          <li key={index} style={{ marginRight: '20px' }}>
             <img src={movie.poster} alt={movie.Title} style={{ width: '150px', height: '225px' }} />
             <p>
               {movie.title} ({movie.year}) - Genre: {movie.genre}
