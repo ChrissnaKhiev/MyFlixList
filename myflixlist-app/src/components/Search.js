@@ -11,7 +11,6 @@ const Search = ({ onSearch }) => {
     event.preventDefault();
     
     try {
-      // Call the onSearch prop, which is a function passed from the parent (App.js)
       await onSearch(searchTerm);
     } catch (error) {
       console.error('Error fetching movies:', error.message);

@@ -4,6 +4,8 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const movieSchema = new mongoose.Schema({
   title: String,
   year: String,
+  genre: String,
+  poster: String
 });
 
 const userSchema = new mongoose.Schema({

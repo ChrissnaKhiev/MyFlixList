@@ -17,10 +17,8 @@ const Login = ({ onLogin }) => {
         }
       });
 
-      // Assuming the server responds with user data upon successful login
       const userData = response.data;
 
-      // Pass the user data to the parent component (App.js) for state update
       onLogin(userData);
     } catch (error) {
       console.error('Error during login:', error);

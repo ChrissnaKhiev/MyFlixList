@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Search from './components/Search';
 import MyList from './components/MyList';
@@ -9,10 +9,9 @@ import Dashboard from './components/Dashboard';
 const App = () => {
   const [movies, setMovies] = useState([]);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
   const [user, setUser] = useState(null);
+  const [watchlist, setWatchlist] = useState([]);
 
-  // Check authentication status when the component mounts
   useEffect(() => {
     axios.get('/user', { withCredentials: true })
       .then((response) => {
@@ -23,6 +22,38 @@ const App = () => {
       });
   }, []);
 
+  const refreshWatchlist = useCallback(async () => {
+    if (!user) {
+      console.log("User is not logged in.");
+      return;
+    }
+
+    try {
+      const response = await axios.get('/watchlist', {
+        headers: {
+          'Authorization': `Bearer ${user.token}`,
+        },
+      });
+      console.log(response.data);
+      setWatchlist(response.data);
+    } catch (error) {
+      console.error('Error fetching watchlist:', error);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      refreshWatchlist();
+    } else {
+      setWatchlist([]);
+    }
+  }, [user, refreshWatchlist]);
+
+  useEffect(() => {
+    console.log(watchlist);
+  }, [watchlist]);
+  
+
   const fetchMovies = async (searchTerm) => {
   try {
     const OMDBKEY = process.env.REACT_APP_OMDBKEY;
@@ -32,7 +63,6 @@ const App = () => {
       throw new Error('Unable to fetch movies.');
     }
 
-    setUser(null);
     setMovies(response.data.Search);
     setError(null);
   } catch (error) {
@@ -43,20 +73,17 @@ const App = () => {
 
 
   const handleSearch = (term) => {
-    setSearchTerm(term);
     fetchMovies(term);
   };
 
   const handleLogin = async (userData) => {
     try {
-      // Check if the login response contains a user object
       if (userData && userData.username) {
         setUser(userData);
       } else {
         // Handle unsuccessful login (optional) dunno why
         window.location.reload();
         // console.error('Login failed. Invalid user data received.');
-        // You can display an error message or perform other actions as needed
       }
     } catch (error) {
       console.error('Error during login:', error);
@@ -66,7 +93,6 @@ const App = () => {
   const handleLogout = async () => {
     try {
       console.log('Logging out...');
-      // Add a logout request to the server if needed
       await axios.get('/logout', { withCredentials: true,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -88,18 +114,16 @@ const App = () => {
       <div>
         <p>Welcome, {user.username}!</p>
         <button onClick={handleLogout}>Logout</button>
-        {/* Show Dashboard component if user is authenticated */}
         <Dashboard />
       </div>
     ) : (
       <Login onLogin={handleLogin} />
     )}
 
-    {/* Rest of your components */}
     <Search onSearch={handleSearch} />
     {error && <p>{error}</p>}
-    <MyList movies={movies} searchTerm={searchTerm} />
-    <SearchResults movies={movies} />
+    <SearchResults movies={movies} user={user} refreshWatchlist={refreshWatchlist} />
+    <MyList watchlist={watchlist} />
   </div>
   );
 };

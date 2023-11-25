@@ -5,7 +5,6 @@ const Dashboard = () => {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    // Fetch user profile data when the component mounts
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get('/profile', { withCredentials: true });
@@ -29,7 +28,6 @@ const Dashboard = () => {
       {profile && (
         <div>
           <p>Username: {profile.username}</p>
-          {/* Add other profile information as needed */}
         </div>
       )}
     </div>

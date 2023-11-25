@@ -21,8 +21,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.json());
 
-// Use LocalStrategy with Passport
 passport.use(new LocalStrategy(User.authenticate()));
 
 // Serialize and Deserialize user (to store user in session)
@@ -73,7 +73,7 @@ app.get('/dashboard', isLoggedIn, (req, res) => {
 
 app.get('/user', (req, res) => {
   if (req.isAuthenticated()) {
-    res.json(req.user); // Assuming user data is stored in req.user when authenticated
+    res.json(req.user); 
   } else {
     res.status(401).json({ error: 'Not authenticated' });
   }
@@ -81,7 +81,9 @@ app.get('/user', (req, res) => {
 
 // Watchlist Route (authenticated users only)
 app.post('/add-to-watchlist', isLoggedIn, (req, res) => {
-  const { title, year } = req.body;
+  const { title, year, genre, poster } = req.body;
+  console.log("Request body:", req.body);
+  console.log(req.body);
 
   User.findById(req.user._id)
     .exec()
@@ -90,10 +92,10 @@ app.post('/add-to-watchlist', isLoggedIn, (req, res) => {
         return res.status(404).send('User not found');
       }
 
-      const newMovie = { title, year }; // Add more fields as needed
+      const newMovie = { title, year, genre, poster }; 
       user.watchlist.push(newMovie);
 
-      return user.save();  // Save the updated user document
+      return user.save();  
     })
     .then(() => {
       res.send('Movie added to watchlist successfully');
@@ -108,14 +110,12 @@ app.post('/add-to-watchlist', isLoggedIn, (req, res) => {
 app.get('/logout', (req, res) => {
   console.log('Logout request received');
 
-  // Use req.logout with a callback function
   req.logout((err) => {
     if (err) {
       console.error('Error during logout:', err);
       return res.status(500).json({ error: 'Internal Server Error' });
     }
 
-    // Clear the user session and send a response
     req.session.destroy((destroyErr) => {
       if (destroyErr) {
         console.error('Error destroying session:', destroyErr);
@@ -137,15 +137,12 @@ function isLoggedIn(req, res, next) {
   res.redirect('/login');
 }
 
-// Add the /profile endpoint
 app.get('/profile', isLoggedIn, (req, res) => {
   res.json({
     username: req.user.username,
-    email: req.user.email, // Add other user-specific fields as needed
   });
 });
 
-// Add the /watchlist endpoint
 app.get('/watchlist', isLoggedIn, (req, res) => {
   User.findById(req.user._id)
     .exec()
