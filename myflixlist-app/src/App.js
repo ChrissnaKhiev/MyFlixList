@@ -115,6 +115,7 @@ const App = () => {
         <p>Welcome, {user.username}!</p>
         <button onClick={handleLogout}>Logout</button>
         <Dashboard />
+        <MyList watchlist={watchlist} user={user} refreshWatchlist={refreshWatchlist} />
       </div>
     ) : (
       <Login onLogin={handleLogin} />
@@ -123,7 +124,6 @@ const App = () => {
     <Search onSearch={handleSearch} />
     {error && <p>{error}</p>}
     <SearchResults movies={movies} user={user} refreshWatchlist={refreshWatchlist} />
-    <MyList watchlist={watchlist} />
   </div>
   );
 };

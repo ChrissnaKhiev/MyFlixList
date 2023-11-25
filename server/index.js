@@ -128,6 +128,28 @@ app.get('/logout', (req, res) => {
   });
 });
 
+app.post('/remove-from-watchlist', isLoggedIn, (req, res) => {
+  const { movieId } = req.body;
+
+  User.findById(req.user._id)
+    .exec()
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+
+      // Remove the movie from the watchlist
+      user.watchlist = user.watchlist.filter(movie => movie._id.toString() !== movieId);
+
+      return user.save();
+    })
+    .then(() => res.send('Movie removed from watchlist successfully'))
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error removing movie from watchlist');
+    });
+});
+
 
 // Middleware to check if user is authenticated
 function isLoggedIn(req, res, next) {
