@@ -3,6 +3,7 @@ import axios from 'axios';
 import Search from './components/Search';
 import MyList from './components/MyList';
 import Login from './components/Login';
+import Register from './components/Register';
 import SearchResults from './components/SearchResults';
 import Dashboard from './components/Dashboard';
 
@@ -106,10 +107,15 @@ const App = () => {
     }
   };
   
+  const handleRegister = (userData) => {
+    setUser(userData.user);
+    console.log('User registered:', userData);
+  };
 
   return (
     <div>
     <h1>My Flix List</h1>
+    <Register onRegister={handleRegister} />
     {user ? (
       <div>
         <p>Welcome, {user.username}!</p>

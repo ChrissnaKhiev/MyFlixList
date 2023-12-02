@@ -41,10 +41,10 @@ app.post('/register', (req, res) => {
   User.register(newUser, password, (err, user) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Error registering user');
+      return res.status(500).send(err.message);
     }
     passport.authenticate('local')(req, res, () => {
-      res.send('User registered successfully');
+      res.status(200).send({ message: 'User registered successfully'});
     });
   });
 });
