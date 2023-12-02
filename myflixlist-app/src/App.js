@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import Search from './components/Search';
 import MyList from './components/MyList';
@@ -6,6 +7,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import SearchResults from './components/SearchResults';
 import Dashboard from './components/Dashboard';
+import MovieDetail from './components/MovieDetail';
 
 const App = () => {
   const [movies, setMovies] = useState([]);
@@ -113,24 +115,32 @@ const App = () => {
   };
 
   return (
-    <div>
-    <h1>My Flix List</h1>
-    <Register onRegister={handleRegister} />
-    {user ? (
+    <Router>
       <div>
-        <p>Welcome, {user.username}!</p>
-        <button onClick={handleLogout}>Logout</button>
-        <Dashboard />
-        <MyList watchlist={watchlist} user={user} refreshWatchlist={refreshWatchlist} />
+        <h1>My Flix List</h1>
+        <Routes>
+          <Route path="/" element={
+            <>
+              <Register onRegister={handleRegister} />
+              {user ? (
+                <div>
+                  <p>Welcome, {user.username}!</p>
+                  <button onClick={handleLogout}>Logout</button>
+                  <Dashboard />
+                  <MyList watchlist={watchlist} user={user} refreshWatchlist={refreshWatchlist} />
+                </div>
+              ) : (
+                <Login onLogin={handleLogin} />
+              )}
+              <Search onSearch={handleSearch} />
+              {error && <p>{error}</p>}
+              <SearchResults movies={movies} user={user} refreshWatchlist={refreshWatchlist} />
+            </>
+          } />
+          <Route path="/movie-detail/:title" element={<MovieDetail />} />
+        </Routes>
       </div>
-    ) : (
-      <Login onLogin={handleLogin} />
-    )}
-
-    <Search onSearch={handleSearch} />
-    {error && <p>{error}</p>}
-    <SearchResults movies={movies} user={user} refreshWatchlist={refreshWatchlist} />
-  </div>
+    </Router>
   );
 };
 

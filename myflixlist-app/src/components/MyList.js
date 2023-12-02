@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const MyList = ({ watchlist, user, refreshWatchlist }) => {
   const [detailedList, setDetailedList] = useState([]);
@@ -46,15 +47,17 @@ const MyList = ({ watchlist, user, refreshWatchlist }) => {
   return (
     <div>
       <h1>MyList</h1>
-        <ul style={{ listStyleType: 'none', padding: 0, display: 'flex', overflowX: 'auto' }}>
-          {watchlist.map((movie, index) => (
-            <li key={index} style={{ marginRight: '20px' }}>
+      <ul style={{ listStyleType: 'none', padding: 0, display: 'flex', overflowX: 'auto' }}>
+        {watchlist.map((movie, index) => (
+          <li key={index} style={{ marginRight: '20px' }}>
+            <Link to={`/movie-detail/${movie.title}`}>
               <img src={movie.poster} alt={movie.title} style={{ width: '150px', height: '225px' }} />
-              <p>{movie.title} ({movie.year}) - Genre: {movie.genre}</p>
-              <button onClick={() => removeFromWatchlist(movie._id)}>Remove from Watchlist</button>
-            </li>
-          ))}
-        </ul>
+              <p>{movie.title} ({movie.year})</p>
+            </Link>
+            <button onClick={() => removeFromWatchlist(movie._id)}>Remove from Watchlist</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

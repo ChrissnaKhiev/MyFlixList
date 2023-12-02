@@ -1,4 +1,4 @@
-// components/SearchResults.js
+import { Link } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
 
@@ -35,9 +35,12 @@ const SearchResults = ({ movies, user, refreshWatchlist }) => {
       {movies.length > 0 ? (
         <ul style={{ listStyleType: 'none', padding: 0, display: 'flex', overflowX: 'auto' }}>
           {movies.map((movie) => (
-            <li key={movie.imdbID} style={{ marginRight: '20px' }}>
-              <img src={movie.Poster} alt={movie.Title} style={{ width: '150px', height: '225px' }} />
-              <p>Title: {movie.Title}</p>
+            <li key={movie.title} style={{ marginRight: '20px' }}>
+              {/* Wrap the image and title in a Link */}
+              <Link to={`/movie-detail/${movie.Title}`}>
+                <img src={movie.Poster} alt={movie.Title} style={{ width: '150px', height: '225px' }} />
+                <p>Title: {movie.Title}</p>
+              </Link>
               <p>Year: {movie.Year}</p>
               <button onClick={() => addToWatchlist(movie)}>Add to Watchlist</button>
             </li>
@@ -47,7 +50,7 @@ const SearchResults = ({ movies, user, refreshWatchlist }) => {
         <p>No results found or search.</p>
       )}
     </div>
-  );
+  );  
 };
 
 export default SearchResults;
