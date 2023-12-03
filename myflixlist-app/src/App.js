@@ -137,7 +137,7 @@ const App = () => {
               <SearchResults movies={movies} user={user} refreshWatchlist={refreshWatchlist} />
             </>
           } />
-          <Route path="/movie-detail/:title" element={<MovieDetail />} />
+          <Route path="/movie-detail/:title" element={<MovieDetail user={user} />} />
         </Routes>
       </div>
     </Router>
