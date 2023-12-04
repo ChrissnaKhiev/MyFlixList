@@ -2,19 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const MovieDetail = ( user ) => {
+const MovieDetail = ({ user }) => {
   const [movieDetails, setMovieDetails] = useState({});
-  const { title } = useParams();
-  
+  const { imdbID } = useParams();
+
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
-
-        const response = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBKEY}&t=${title}`);
+        const response = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBKEY}&i=${imdbID}`);
         if(response.data && response.data.Title) {
           setMovieDetails(response.data);
         } else {
-          // Handle case where movie data is not as expected
           console.log('Movie data not found or invalid:', response.data);
         }
       } catch (error) {
@@ -23,7 +21,7 @@ const MovieDetail = ( user ) => {
     };
 
     fetchMovieDetails();
-  }, [title]);
+  }, [imdbID]);
 
   const addToWatchlist = async (movie) => {
     if (!user) {
@@ -43,27 +41,28 @@ const MovieDetail = ( user ) => {
           'Authorization': `Bearer ${user.token}`,
         },
       });
-      console.log(response.data);
     } catch (error) {
       console.error('Error adding movie to watchlist:', error);
     }
   };
 
   return (
-    <div>
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px', marginTop: '150px' }}>
       {movieDetails.Title ? (
-        <div>
-          <h2>{movieDetails.Title}</h2>
-          <button onClick={addToWatchlist}>Add to Watchlist</button>
-          <img src={movieDetails.Poster} alt={movieDetails.title} style={{ width: '150px', height: '225px' }} />
-          <p>Year: {movieDetails.Year}</p>
-          <p>Rated: {movieDetails.Rated}</p>
-          <p>Metascore: {movieDetails.Metascore}/100</p>
-          <p>imdb Rating: {movieDetails.imdbRating}/10</p>
-          <p>Genre: {movieDetails.Genre}</p>
-          <p>Director: {movieDetails.Director}</p>
-          <p>Notable Actors: {movieDetails.Actors}</p>
-          <p>Synopsis: {movieDetails.Plot}</p>
+        <div style={{ display: 'flex', alignItems: 'stretch', maxWidth: '800px', width: '100%' }}>
+          <img src={movieDetails.Poster} alt={movieDetails.Title} style={{ flexShrink: 0, height: 'auto', marginRight: '20px' }} />
+          <div>
+            <h2>{movieDetails.Title}</h2>
+            <p>Year: {movieDetails.Year}</p>
+            <p>Rated: {movieDetails.Rated}</p>
+            <p>Metascore: {movieDetails.Metascore}/100</p>
+            <p>imdb Rating: {movieDetails.imdbRating}/10</p>
+            <p>Genre: {movieDetails.Genre}</p>
+            <p>Director: {movieDetails.Director}</p>
+            <p>Notable Actors: {movieDetails.Actors}</p>
+            <p>Synopsis: {movieDetails.Plot}</p>
+            <button onClick={addToWatchlist}>Add to Watchlist</button>
+          </div>
         </div>
       ) : (
         <p>Loading movie details...</p>

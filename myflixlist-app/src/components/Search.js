@@ -18,13 +18,15 @@ const Search = ({ onSearch }) => {
   };
 
   return (
-    <form onSubmit={handleSearch}>
-      <label>
-        Search Movies:
-        <input type="text" value={searchTerm} onChange={handleInputChange} />
-      </label>
-      <button type="submit">Search</button>
-    </form>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+      <form onSubmit={handleSearch} style={{ textAlign: 'center' }}>
+        <label>
+          Search Movies:
+          <input type="text" value={searchTerm} onChange={handleInputChange} />
+        </label>
+        <button type="submit">Search</button>
+      </form>
+    </div>
   );
 };
 

@@ -156,14 +156,29 @@ function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect('/login');
+  res.status(401).send({ error: 'Not authenticated' });
 }
 
+// Profile route
 app.get('/profile', isLoggedIn, (req, res) => {
-  res.json({
-    username: req.user.username,
-  });
+  User.findById(req.user._id)
+    .exec()
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+
+      res.json({
+        username: user.username,
+        watchlist: user.watchlist
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error fetching user data');
+    });
 });
+
 
 app.get('/watchlist', isLoggedIn, (req, res) => {
   User.findById(req.user._id)

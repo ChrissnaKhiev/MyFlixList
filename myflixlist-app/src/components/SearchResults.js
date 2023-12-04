@@ -14,15 +14,14 @@ const SearchResults = ({ movies, user, refreshWatchlist }) => {
         title: movie.Title,
         year: movie.Year,
         poster: movie.Poster,
-        genre: movie.Genre
+        genre: movie.Genre,
+        imdbID: movie.ImdbID
       }, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${user.token}`,
         },
       });
-      
-      console.log(response.data);
     } catch (error) {
       console.error('Error adding movie to watchlist:', error);
     }
@@ -30,14 +29,13 @@ const SearchResults = ({ movies, user, refreshWatchlist }) => {
   };
 
   return (
-    <div>
+    <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', padding: '20px' }}>
       <h1>Search Results</h1>
       {movies.length > 0 ? (
-        <ul style={{ listStyleType: 'none', padding: 0, display: 'flex', overflowX: 'auto' }}>
+        <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
           {movies.map((movie) => (
-            <li key={movie.title} style={{ marginRight: '20px' }}>
-              {/* Wrap the image and title in a Link */}
-              <Link to={`/movie-detail/${movie.Title}`}>
+            <li key={movie.imdbID} style={{ display: 'inline-block', marginRight: '20px' }}>
+              <Link to={`/movie-detail/${movie.imdbID}`}>
                 <img src={movie.Poster} alt={movie.Title} style={{ width: '150px', height: '225px' }} />
                 <p>Title: {movie.Title}</p>
               </Link>

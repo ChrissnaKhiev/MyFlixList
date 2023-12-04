@@ -1,19 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
 import axios from 'axios';
 import Search from './components/Search';
-import MyList from './components/MyList';
 import Login from './components/Login';
 import Register from './components/Register';
 import SearchResults from './components/SearchResults';
 import Dashboard from './components/Dashboard';
 import MovieDetail from './components/MovieDetail';
+import LoginHandler from './components/LoginHandler';
+import Navbar from './components/Navbar';
+import './App.css';
 
 const App = () => {
   const [movies, setMovies] = useState([]);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [watchlist, setWatchlist] = useState([]);
+  const [previousUser, setPreviousUser] = useState(null);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     axios.get('/user', { withCredentials: true })
@@ -24,6 +28,15 @@ const App = () => {
         console.error('Error checking authentication status:', error);
       });
   }, []);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    setPreviousUser(user);
+  }, [user]);
 
   const refreshWatchlist = useCallback(async () => {
     if (!user) {
@@ -37,7 +50,6 @@ const App = () => {
           'Authorization': `Bearer ${user.token}`,
         },
       });
-      console.log(response.data);
       setWatchlist(response.data);
     } catch (error) {
       console.error('Error fetching watchlist:', error);
@@ -51,11 +63,6 @@ const App = () => {
       setWatchlist([]);
     }
   }, [user, refreshWatchlist]);
-
-  useEffect(() => {
-    console.log(watchlist);
-  }, [watchlist]);
-  
 
   const fetchMovies = async (searchTerm) => {
   try {
@@ -84,9 +91,7 @@ const App = () => {
       if (userData && userData.username) {
         setUser(userData);
       } else {
-        // Handle unsuccessful login (optional) dunno why
         window.location.reload();
-        // console.error('Login failed. Invalid user data received.');
       }
     } catch (error) {
       console.error('Error during login:', error);
@@ -101,8 +106,6 @@ const App = () => {
           'Content-Type': 'application/x-www-form-urlencoded',
         } });
       setUser(null);
-      console.log(user);
-      console.log('Logout successful');
       window.location.reload();
     } catch (error) {
       console.error('Error during logout:', error);
@@ -114,30 +117,46 @@ const App = () => {
     console.log('User registered:', userData);
   };
 
+  const HomePage = () => (
+    <div className="homepage-container">
+      <h1>My Flix List</h1>
+      <div className="auth-forms">
+        <Register onRegister={handleRegister} />
+        <Login onLogin={handleLogin} />
+      </div>
+    </div>
+  );
+
+  const SearchPage = () => (
+    <div>
+      <Search onSearch={handleSearch} />
+      <SearchResults movies={movies} user={user} refreshWatchlist={refreshWatchlist} />
+    </div>
+  );
+
   return (
     <Router>
       <div>
-        <h1>My Flix List</h1>
+        <LoginHandler user={user} previousUser={previousUser} />
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          padding: '10px', 
+          backgroundColor: '#f0f0f0', 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          zIndex: 1000
+        }}>
+          <Navbar user={user} onLogout={handleLogout} />
+          <h1 style={{ margin: '0 20px' }}>My Flix List</h1>
+        </div>
         <Routes>
-          <Route path="/" element={
-            <>
-              <Register onRegister={handleRegister} />
-              {user ? (
-                <div>
-                  <p>Welcome, {user.username}!</p>
-                  <button onClick={handleLogout}>Logout</button>
-                  <Dashboard />
-                  <MyList watchlist={watchlist} user={user} refreshWatchlist={refreshWatchlist} />
-                </div>
-              ) : (
-                <Login onLogin={handleLogin} />
-              )}
-              <Search onSearch={handleSearch} />
-              {error && <p>{error}</p>}
-              <SearchResults movies={movies} user={user} refreshWatchlist={refreshWatchlist} />
-            </>
-          } />
-          <Route path="/movie-detail/:title" element={<MovieDetail user={user} />} />
+          <Route path="/" element={!user ? <HomePage /> : <Dashboard user={user} />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/movie-detail/:imdbID" element={<MovieDetail user={user} />} />
         </Routes>
       </div>
     </Router>
