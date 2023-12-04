@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const MovieDetail = ({ user }) => {
   const [movieDetails, setMovieDetails] = useState({});
+  const [similarMovies, setSimilarMovies] = useState([]);
   const { imdbID } = useParams();
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
         const response = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBKEY}&i=${imdbID}`);
-        if(response.data && response.data.Title) {
+        if (response.data && response.data.Title) {
           setMovieDetails(response.data);
+          fetchSimilarMovies(response.data.Title);
         } else {
           console.log('Movie data not found or invalid:', response.data);
         }
@@ -22,6 +24,21 @@ const MovieDetail = ({ user }) => {
 
     fetchMovieDetails();
   }, [imdbID]);
+
+  const fetchSimilarMovies = async (title) => {
+    try {
+      const response = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDBKEY}&s=${title}`);
+      if (response.data.Search) {
+        const filteredMovies = response.data.Search.filter(movie => movie.imdbID !== imdbID);
+        setSimilarMovies(filteredMovies);
+      } else {
+        // If there are no similar movies, set the array to be empty
+        setSimilarMovies([]);
+      }
+    } catch (error) {
+      console.error('Error fetching similar movies:', error);
+    }
+  };
 
   const addToWatchlist = async (movie) => {
     if (!user) {
@@ -67,6 +84,20 @@ const MovieDetail = ({ user }) => {
       ) : (
         <p>Loading movie details...</p>
       )}
+      <div>
+        <h2>Similar Movies</h2>
+        {similarMovies.length > 0 ? (
+          <ul>
+            {similarMovies.map(movie => (
+              <li key={movie.imdbID}>
+                <Link to={`/movie-detail/${movie.imdbID}`}>{movie.Title}</Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No similar movies.</p>
+        )}
+      </div>
     </div>
   );
   

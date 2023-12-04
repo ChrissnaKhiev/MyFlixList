@@ -48,9 +48,9 @@ const MyList = ({ watchlist, user, refreshWatchlist }) => {
   return (
     <div>
       <h1>My List</h1>
-      {detailedList && detailedList.length > 0 ? (  // Use detailedList here
+      {detailedList && detailedList.length > 0 ? (
         <ul style={{ listStyleType: 'none', padding: 0, display: 'flex', overflowX: 'auto' }}>
-          {detailedList.map((movie, index) => {  // And here
+          {detailedList.map((movie, index) => {
             return (
               <li key={index} style={{ marginRight: '20px' }}>
                 <Link to={`/movie-detail/${movie.imdbID}`}>
