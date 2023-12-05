@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Form, Button, Card } from 'react-bootstrap';
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -26,22 +27,24 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form>
-        <label>
-          Username:
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-        </label>
-        <br />
-        <label>
-          Password:
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        </label>
-        <br />
-        <button type="button" onClick={handleLogin}>Login</button>
-      </form>
-    </div>
+    <Card className="mx-auto mt-1 border-danger" style={{ maxWidth: '600px' }}>
+            <Card.Body>
+                <Card.Title>Login</Card.Title>
+                <Form>
+                    <Form.Group className="mb-3" controlId="formBasicEmail">
+                        <Form.Label>Username</Form.Label>
+                        <Form.Control type="text" placeholder="Enter username" value={username} onChange={(e) => setUsername(e.target.value)} />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="formBasicPassword">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    </Form.Group>
+
+                    <Button variant="danger" type="button" onClick={handleLogin}>Login</Button>
+                </Form>
+            </Card.Body>
+        </Card>
   );
 };
 

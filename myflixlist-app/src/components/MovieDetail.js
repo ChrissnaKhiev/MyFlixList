@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { Card, Button, ListGroup, Container, Row, Col, Image, Alert } from 'react-bootstrap';
 
 const MovieDetail = ({ user }) => {
   const [movieDetails, setMovieDetails] = useState({});
   const [similarMovies, setSimilarMovies] = useState([]);
+  const [message, setMessage] = useState('');
   const { imdbID } = useParams();
 
   useEffect(() => {
@@ -32,7 +34,6 @@ const MovieDetail = ({ user }) => {
         const filteredMovies = response.data.Search.filter(movie => movie.imdbID !== imdbID);
         setSimilarMovies(filteredMovies);
       } else {
-        // If there are no similar movies, set the array to be empty
         setSimilarMovies([]);
       }
     } catch (error) {
@@ -58,47 +59,69 @@ const MovieDetail = ({ user }) => {
           'Authorization': `Bearer ${user.token}`,
         },
       });
+      setMessage(`Added '${movieDetails.Title}' to watchlist.`);
     } catch (error) {
       console.error('Error adding movie to watchlist:', error);
+      setMessage(`Error adding movie to watchlist: ${error.message}`);
     }
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px', marginTop: '150px' }}>
+    <Container style={{ marginTop: '100px' }}>
       {movieDetails.Title ? (
-        <div style={{ display: 'flex', alignItems: 'stretch', maxWidth: '800px', width: '100%' }}>
-          <img src={movieDetails.Poster} alt={movieDetails.Title} style={{ flexShrink: 0, height: 'auto', marginRight: '20px' }} />
-          <div>
-            <h2>{movieDetails.Title}</h2>
-            <p>Year: {movieDetails.Year}</p>
-            <p>Rated: {movieDetails.Rated}</p>
-            <p>Metascore: {movieDetails.Metascore}/100</p>
-            <p>imdb Rating: {movieDetails.imdbRating}/10</p>
-            <p>Genre: {movieDetails.Genre}</p>
-            <p>Director: {movieDetails.Director}</p>
-            <p>Notable Actors: {movieDetails.Actors}</p>
-            <p>Synopsis: {movieDetails.Plot}</p>
-            <button onClick={addToWatchlist}>Add to Watchlist</button>
-          </div>
-        </div>
+        <Row>
+          <Col md={4}>
+            <Card>
+              <Card.Img variant="top" src={movieDetails.Poster} alt={movieDetails.Title} />
+            </Card>
+          </Col>
+          <Col md={8}>
+            <Card>
+              <Card.Body>
+                <Card.Title>{movieDetails.Title}</Card.Title>
+                <ListGroup variant="flush">
+                  <ListGroup.Item>Year: {movieDetails.Year}</ListGroup.Item>
+                  <ListGroup.Item>Rated: {movieDetails.Rated}</ListGroup.Item>
+                  <ListGroup.Item>Metascore: {movieDetails.Metascore}/100</ListGroup.Item>
+                  <ListGroup.Item>IMDb Rating: {movieDetails.imdbRating}/10</ListGroup.Item>
+                  <ListGroup.Item>Genre: {movieDetails.Genre}</ListGroup.Item>
+                  <ListGroup.Item>Director: {movieDetails.Director}</ListGroup.Item>
+                  <ListGroup.Item>Actors: {movieDetails.Actors}</ListGroup.Item>
+                  <ListGroup.Item>{movieDetails.Plot}</ListGroup.Item>
+                </ListGroup>
+                <Button variant="danger" onClick={addToWatchlist}>Add to Watchlist</Button>
+                {message && <Alert variant="success" style={{ marginTop: '10px'}}>{message}</Alert>}
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
       ) : (
         <p>Loading movie details...</p>
       )}
-      <div>
-        <h2>Similar Movies</h2>
-        {similarMovies.length > 0 ? (
-          <ul>
-            {similarMovies.map(movie => (
-              <li key={movie.imdbID}>
-                <Link to={`/movie-detail/${movie.imdbID}`}>{movie.Title}</Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No similar movies.</p>
-        )}
-      </div>
-    </div>
+      <h2 className="mt-4 text-center">Similar Movies:</h2>
+      {similarMovies.length > 0 ? (
+        <Row xs={2} md={3} lg={4} xl={5} className="g-3">
+          {similarMovies.map(movie => (
+            <Col key={movie.imdbID}>
+              <Card className="h-100">
+                <Link to={`/movie-detail/${movie.imdbID}`}>
+                  <div className="d-flex justify-content-center align-items-center" style={{ height: '200px', padding: '10px' }}>
+                    <Image src={movie.Poster} alt={movie.Title} className="rounded" style={{ maxHeight: '100%', maxWidth: '100%' }} />
+                  </div>
+                </Link>
+                <Card.Body>
+                  <Card.Title className="text-center">
+                    <Link to={`/movie-detail/${movie.imdbID}`}>{movie.Title}</Link>
+                  </Card.Title>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <p>No similar movies found.</p>
+      )}
+    </Container>
   );
   
 };

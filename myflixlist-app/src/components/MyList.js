@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { Card, Container, Row, Col, Button, Alert } from 'react-bootstrap';
 
 const MyList = ({ watchlist, user, refreshWatchlist }) => {
   const [detailedList, setDetailedList] = useState([]);
+  const [message, setMessage] = useState('');
 
   const removeFromWatchlist = async (movieId) => {
     try {
@@ -13,8 +15,10 @@ const MyList = ({ watchlist, user, refreshWatchlist }) => {
         },
       });
       refreshWatchlist();
+      setMessage(`Removed movie from watchlist.`);
     } catch (error) {
       console.error('Error removing movie from watchlist:', error);
+      setMessage(`Error removing movie from watchlist: ${error.message}`);
     }
   };
   
@@ -46,26 +50,31 @@ const MyList = ({ watchlist, user, refreshWatchlist }) => {
   }, [watchlist]);
 
   return (
-    <div>
-      <h1>My List</h1>
+    <Container>
+      {message && <Alert variant="info">{message}</Alert>}
+      <h1 className="text-center my-4">My List</h1>
       {detailedList && detailedList.length > 0 ? (
-        <ul style={{ listStyleType: 'none', padding: 0, display: 'flex', overflowX: 'auto' }}>
-          {detailedList.map((movie, index) => {
-            return (
-              <li key={index} style={{ marginRight: '20px' }}>
+        <Row xs={2} md={3} lg={4} className="g-3">
+          {detailedList.map((movie, index) => (
+            <Col key={index}>
+              <Card className="h-100">
                 <Link to={`/movie-detail/${movie.imdbID}`}>
-                  <img src={movie.poster} alt={movie.title} style={{ width: '150px', height: '225px' }} />
-                  <p>{movie.title} ({movie.year})</p>
+                  <Card.Img variant="top" src={movie.poster} alt={movie.title} style={{ width: '100%', height: 'auto', objectFit: 'cover' }} />
                 </Link>
-                <button onClick={() => removeFromWatchlist(movie._id)}>Remove from Watchlist</button>
-              </li>
-            );
-          })}
-        </ul>
+                <Card.Body>
+                  <Card.Title>
+                    <Link to={`/movie-detail/${movie.imdbID}`}>{movie.title} ({movie.year})</Link>
+                  </Card.Title>
+                  <Button variant="danger" onClick={() => removeFromWatchlist(movie._id)}>Remove from Watchlist</Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       ) : (
-        <p>No movies in watchlist.</p>
+        <p className="text-center">No movies in watchlist.</p>
       )}
-    </div>
+    </Container>
   );
 };
 

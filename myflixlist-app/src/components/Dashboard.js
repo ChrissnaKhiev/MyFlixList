@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MyList from './MyList';
+import { Container, Card, Alert } from 'react-bootstrap';
 
 const Dashboard = ({ user }) => {
   const [profile, setProfile] = useState(null);
@@ -51,15 +52,19 @@ const Dashboard = ({ user }) => {
   
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      {profile && (
-        <div>
-          <p>Welcome, {profile.username}!</p>
-          {user ? <MyList watchlist={watchlist} user={user} refreshWatchlist={refreshWatchlist} /> : <p>Loading...</p>}
-        </div>
+    <Container className="my-4">
+      <h1 className="text-center mb-4" style={{ marginTop: '100px' }}>Dashboard</h1>
+      {profile ? (
+        <Card>
+          <Card.Header>Welcome, {profile.username}!</Card.Header>
+          <Card.Body>
+            {user ? <MyList watchlist={watchlist} user={user} refreshWatchlist={refreshWatchlist} /> : <Alert variant="info">Loading...</Alert>}
+          </Card.Body>
+        </Card>
+      ) : (
+        <Alert variant="warning">User profile is not available.</Alert>
       )}
-    </div>
+    </Container>
   );
 };
 

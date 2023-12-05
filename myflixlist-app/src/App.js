@@ -9,6 +9,7 @@ import Dashboard from './components/Dashboard';
 import MovieDetail from './components/MovieDetail';
 import LoginHandler from './components/LoginHandler';
 import Navbar from './components/Navbar';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 const App = () => {
@@ -118,13 +119,19 @@ const App = () => {
   };
 
   const HomePage = () => (
-    <div className="homepage-container">
+    <div className="d-flex justify-content-center align-items-center" style={{ height: '85vh' }}>
+    <div className="text-center">
       <h1>My Flix List</h1>
-      <div className="auth-forms">
-        <Register onRegister={handleRegister} />
-        <Login onLogin={handleLogin} />
+      <div className="d-flex justify-content-center" style={{ gap: '10px' }}>
+        <div style={{ maxWidth: '300px' }}>
+          <Register onRegister={handleRegister} />
+        </div>
+        <div style={{ maxWidth: '300px' }}>
+          <Login onLogin={handleLogin} />
+        </div>
       </div>
     </div>
+  </div>
   );
 
   const SearchPage = () => (
@@ -136,7 +143,7 @@ const App = () => {
 
   return (
     <Router>
-      <div>
+      {/* <div>
         <LoginHandler user={user} previousUser={previousUser} />
         <div style={{ 
           display: 'flex', 
@@ -158,7 +165,15 @@ const App = () => {
           <Route path="/search" element={<SearchPage />} />
           <Route path="/movie-detail/:imdbID" element={<MovieDetail user={user} />} />
         </Routes>
-      </div>
+      </div> */}
+      <Navbar user={user} onLogout={handleLogout} />
+      <div className="container" style={{ paddingTop: '20px', paddingBottom: '20px', backgroundColor: '#fff', borderRadius: '5px' }}>
+                <Routes>
+                    <Route path="/" element={!user ? <HomePage /> : <Dashboard user={user} />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/movie-detail/:imdbID" element={<MovieDetail user={user} />} />
+                </Routes>
+            </div>
     </Router>
   );
 };

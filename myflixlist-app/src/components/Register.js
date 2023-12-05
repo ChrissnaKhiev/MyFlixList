@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Form, Button, Card, Alert } from 'react-bootstrap';
 
 const Register = ({ onRegister }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -19,44 +20,47 @@ const Register = ({ onRegister }) => {
         onRegister(response.data);
         setUsername('');
         setPassword('');
-        setErrorMessage('Successful Registration.');
+        setMessage('Registration successful.');
       } else {
-        setErrorMessage('Registration failed. Please try again.');
+        setMessage('Registration failed. Please try again.');
       }
     } catch (error) {
-      setErrorMessage(error.response?.data || 'Error during registration');
+      setMessage(error.response?.data || 'Error during registration');
       console.error(error);
     }
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-      <form onSubmit={handleRegister}>
-        <div>
-          <label>
-            Username:
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Password:
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-        </div>
-        <button type="submit">Register</button>
-      </form>
-    </div>
+    <Card className="mx-auto mt-1 border-danger" style={{ maxWidth: '600px' }}>
+            <Card.Body>
+                <Card.Title>Register</Card.Title>
+                <Form onSubmit={handleRegister}>
+                    <Form.Group className="mb-3" controlId="registerUsername">
+                        <Form.Label>Username</Form.Label>
+                        <Form.Control 
+                            type="text" 
+                            placeholder="Enter username" 
+                            value={username} 
+                            onChange={(e) => setUsername(e.target.value)} 
+                        />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3" controlId="registerPassword">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control 
+                            type="password" 
+                            placeholder="Password" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                        />
+                    </Form.Group>
+
+                    <Button variant="danger" type="submit">Register</Button>
+                    {message && <Alert style={{ marginTop: '10px'}} variant="success">{message}</Alert>}
+
+                </Form>
+            </Card.Body>
+        </Card>
   );
 };
 
