@@ -143,29 +143,6 @@ const App = () => {
 
   return (
     <Router>
-      {/* <div>
-        <LoginHandler user={user} previousUser={previousUser} />
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between', 
-          padding: '10px', 
-          backgroundColor: '#f0f0f0', 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          zIndex: 1000
-        }}>
-          <Navbar user={user} onLogout={handleLogout} />
-          <h1 style={{ margin: '0 20px' }}>My Flix List</h1>
-        </div>
-        <Routes>
-          <Route path="/" element={!user ? <HomePage /> : <Dashboard user={user} />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/movie-detail/:imdbID" element={<MovieDetail user={user} />} />
-        </Routes>
-      </div> */}
       <Navbar user={user} onLogout={handleLogout} />
       <div className="container" style={{ paddingTop: '20px', paddingBottom: '20px', backgroundColor: '#fff', borderRadius: '5px' }}>
                 <Routes>
